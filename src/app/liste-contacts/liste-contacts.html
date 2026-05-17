@@ -1,88 +1,90 @@
-<!-- HEADER FILTRES -->
+<!-- liste-contacts.component.html -->
 <div>
-  <h2>Contacts ({{ contacts.length }})</h2>
-
-  <button (click)="filtreActif = null">Tous ({{ contacts.length }})</button>
-  <button (click)="filtreActif = true">Actifs</button>
-  <button (click)="filtreActif = false">Inactifs</button>
-
-  @if (contactsFiltres.length === 0) {
-    <p>Aucun contact dans cette catégorie.</p>
-  }
-
-  @if (contacts.length > 10) {
-    <p>📈 Carnet bien rempli !</p>
-  } @else if (contacts.length > 0) {
-    <p>📈 {{ contacts.length }} contact(s) enregistré(s)</p>
-  } @else {
-    <p>📈 Le carnet est vide.</p>
-  }
+<h2>Contacts ({{ contacts.length }})</h2>
+<!-- Boutons filtre (Event Binding) -->
+<button (click)="filtreActif = null"> Tous ({{ contacts.length }})</button>
+<button (click)="filtreActif = true">Actifs</button>
+<button (click)="filtreActif = false">Inactifs</button>
+<!-- @if : message si liste vide -->
+@if (contactsFiltres.length === 0) {
+<p>Aucun contact dans cette catégorie.</p>
+}
+<!-- @if / @else if / @else -->
+@if (contacts.length > 10) {
+<p>📈 Carnet bien rempli !</p>
+} @else if (contacts.length > 0) {
+<p>📈 {{ contacts.length }} contact(s) enregistré(s)</p>
+} @else {
+<p>📈 Le carnet est vide.</p>
+}
 </div>
 
-<!-- LISTE -->
+
+
+<!-- @for avec variables $index, $first, $last, $even, $count -->
 <ul>
-  @for (c of contactsFiltres; track c.email; let i = $index) {
+@for (c of contactsFiltres; track c.email; let i = $index) {
+<li [ngClass]="{
+'contact-actif': c.actif,
+'contact-inactif': !c.actif,
+'top-score': c.score >= 16,
+'premier-item': $first
+}">
 
-    <li
-      [appSurvol]="c.role === 'admin' ? '#FFE0E0' : '#E0F0FF'"
-      [ngClass]="{
-        'contact-actif':  c.actif,
-        'contact-inactif': !c.actif,
-        'top-score':      c.score >= 16,
-        'premier-item':   $first
-      }">
+<!-- Numéro de ligne -->
+<span>{{ i + 1 }}</span>
+<!-- Nom et email -->
+<li [appSurvol]="c.role === 'admin' ? '#FFE0E0' : '#E0F0FF'">
+<strong>{{ c.nom | uppercase }}</strong> 
+<!-- Chaînage avec uppercase -->
+- {{ c.nom | initiales | uppercase }}
+<!-- 'A.B' (déjà en majuscules, mais démontre le chaînage) -->
+({{ c.role }})
+— <em>{{ c.email | slice:0:20 }}</em>
+— Initiales : {{ c.nom | uppercase | slice:0:1 }}
+— Score : {{ c.score | number:'1.1-1' }}/20
+<!-- Taux de réussite en pourcentage -->
+({{ c.score / 20 | percent:'1.0-0' }})
+{{ c.score | mention }}
+<!-- Chaînage de pipes -->
+<!-- Indicateur actif/inactif -->
+@if (c.actif) { <span>📈 Actif</span> }
+@else { <span>📈 Inactif</span> }
+<!-- Marqueur premier/dernier -->
+@if ($first) { <small> (Premier)</small> }
+@if ($last) { <small> (Dernier)</small> }
 
-      <!-- Numéro -->
-      {{ i + 1 }}.
 
-      <!-- Nom en majuscules -->
-      <strong>{{ c.nom | uppercase }}</strong>
+@switch (c.role) {
+@case ('admin') {
+<span>📈 Admin</span>
+}
+@case ('user') {
+<span>📈 Utilisateur</span>
+}
+@case ('guest') {
+<span>📈 Visiteur</span>
+}
+@default {
+<span>❓ Rôle inconnu</span>
+}
+}
+<div appHighlight [isActive]="c.actif">
+Élément actif qui réagit au survol
+</div>
 
-      <!-- Email tronqué -->
-      <em>{{ c.email | slice:0:20 }}</em>
-
-      <!-- Score avec badge coloré -->
-      <span [ngClass]="'score-' + (c.score >= 16 ? 'excellent' :
-                                    c.score >= 10 ? 'passable' : 'echec')">
-        {{ c.score | number:'1.1-1' }}/20
-        ({{ c.score / 20 | percent:'1.0-0' }})
-      </span>
-
-      <!-- Date -->
-      {{ today | date:'dd/MM/yyyy' }}
-
-      <!-- Mention pipe -->
-      | Mention : {{ c.score | mention }}
-
-      <!-- Initiales pipe -->
-      | {{ c.nom | initiales }}
-        {{ c.nom | initiales:'-' }}
-        {{ c.nom | initiales | uppercase }}
-
-      <!-- ✅ appHighlight DANS le li -->
-      <div appHighlight [isActive]="c.actif">
-        Élément actif qui réagit au survol
-      </div>
-
-      <!-- Actions -->
-      <!-- <button (click)="toggleActif(c.email)">
-        {{ c.actif ? 'Désactiver' : 'Activer' }}
-      </button>
-      <button (click)="supprimer(c.email)">Supprimer</button> -->
-
-    </li>
-
-  } @empty {
-    <li>Aucun résultat pour ce filtre.</li>
-  }
+} @empty {
+<li>Aucun résultat pour ce filtre.</li>
+}
 </ul>
-
-<!-- TABLE -->
+<!-- Bonus : @for avec $even/$odd pour lignes alternées -->
 <table>
-  @for (c of contacts; track c.email; let pair = $even) {
-    <tr [style.background]="pair ? '#F5F5F5' : '#FFFFFF'">
-      <td>{{ c.nom }}</td>
-      <td>{{ c.score }}/20</td>
-    </tr>
-  }
+
+@for (c of contacts; track c.email; let pair = $even) {
+<tr [style.background]="pair ? '#F5F5F5' : '#FFFFFF'">
+<td>{{ c.nom }}</td>
+<td>Score : {{ c.score | number:'1.1-1' }}/20</td>
+({{ c.score / 20 | percent:'1.0-0' }})
+</tr>
+}
 </table>
