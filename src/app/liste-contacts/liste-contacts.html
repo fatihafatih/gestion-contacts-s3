@@ -1,0 +1,88 @@
+<!-- HEADER FILTRES -->
+<div>
+  <h2>Contacts ({{ contacts.length }})</h2>
+
+  <button (click)="filtreActif = null">Tous ({{ contacts.length }})</button>
+  <button (click)="filtreActif = true">Actifs</button>
+  <button (click)="filtreActif = false">Inactifs</button>
+
+  @if (contactsFiltres.length === 0) {
+    <p>Aucun contact dans cette catégorie.</p>
+  }
+
+  @if (contacts.length > 10) {
+    <p>📈 Carnet bien rempli !</p>
+  } @else if (contacts.length > 0) {
+    <p>📈 {{ contacts.length }} contact(s) enregistré(s)</p>
+  } @else {
+    <p>📈 Le carnet est vide.</p>
+  }
+</div>
+
+<!-- LISTE -->
+<ul>
+  @for (c of contactsFiltres; track c.email; let i = $index) {
+
+    <li
+      [appSurvol]="c.role === 'admin' ? '#FFE0E0' : '#E0F0FF'"
+      [ngClass]="{
+        'contact-actif':  c.actif,
+        'contact-inactif': !c.actif,
+        'top-score':      c.score >= 16,
+        'premier-item':   $first
+      }">
+
+      <!-- Numéro -->
+      {{ i + 1 }}.
+
+      <!-- Nom en majuscules -->
+      <strong>{{ c.nom | uppercase }}</strong>
+
+      <!-- Email tronqué -->
+      <em>{{ c.email | slice:0:20 }}</em>
+
+      <!-- Score avec badge coloré -->
+      <span [ngClass]="'score-' + (c.score >= 16 ? 'excellent' :
+                                    c.score >= 10 ? 'passable' : 'echec')">
+        {{ c.score | number:'1.1-1' }}/20
+        ({{ c.score / 20 | percent:'1.0-0' }})
+      </span>
+
+      <!-- Date -->
+      {{ today | date:'dd/MM/yyyy' }}
+
+      <!-- Mention pipe -->
+      | Mention : {{ c.score | mention }}
+
+      <!-- Initiales pipe -->
+      | {{ c.nom | initiales }}
+        {{ c.nom | initiales:'-' }}
+        {{ c.nom | initiales | uppercase }}
+
+      <!-- ✅ appHighlight DANS le li -->
+      <div appHighlight [isActive]="c.actif">
+        Élément actif qui réagit au survol
+      </div>
+
+      <!-- Actions -->
+      <!-- <button (click)="toggleActif(c.email)">
+        {{ c.actif ? 'Désactiver' : 'Activer' }}
+      </button>
+      <button (click)="supprimer(c.email)">Supprimer</button> -->
+
+    </li>
+
+  } @empty {
+    <li>Aucun résultat pour ce filtre.</li>
+  }
+</ul>
+
+<!-- TABLE -->
+<table>
+  @for (c of contacts; track c.email; let pair = $even) {
+    <tr [style.background]="pair ? '#F5F5F5' : '#FFFFFF'">
+      <td>{{ c.nom }}</td>
+      <td>{{ c.score }}/20</td>
+    </tr>
+  }
+</table>

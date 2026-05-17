@@ -1,0 +1,9 @@
+/* liste-contacts.css — ajouter !important ou un sélecteur plus fort */
+
+.hovered {
+  background: #FFF9C4 !important;  /* ✅ force l'application */
+}
+
+.active {
+  border: 2px solid #4CAF50 !important;
+}

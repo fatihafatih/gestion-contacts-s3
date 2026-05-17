@@ -1,0 +1,28 @@
+<div>
+  <h3>Statistiques</h3>
+  <p>Total : {{ contacts.length }}</p>
+  <p>Actifs : {{ totalActifs }} / {{ contacts.length }}</p>
+  <p>Score moyen : {{ scoreMoyen }}/20</p>
+
+  <!-- Barre de progression -->
+  <div [ngStyle]="{ 'width': '100%', 'background': '#E0E0E0',
+                    'border-radius': '4px', 'height': '20px' }">
+    <div [ngStyle]="{
+      'width': tauxActivite + '%',
+      'background-color': couleurBarre,
+      'height': '20px',
+      'border-radius': '4px',
+      'transition': 'width 0.5s ease'
+    }"></div>
+  </div>
+  <small>Taux d'activité : {{ tauxActivite }}%</small>
+
+  <!-- Score coloré dynamiquement -->
+  <p [ngStyle]="{
+    'color': scoreMoyen >= 14 ? '#1B5E20' : '#B71C1C',
+    'font-weight': 'bold',
+    'font-size': (16 + scoreMoyen / 4) + 'px'
+  }">
+    Score moyen : {{ scoreMoyen }}/20
+  </p>
+</div>
